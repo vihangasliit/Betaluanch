@@ -1,6 +1,6 @@
-import { Schema, model, models } from 'mongoose';
+import mongoose from 'mongoose';
 
-const EmployeeSchema = new Schema({
+const EmployeeSchema = mongoose.Schema({
     fullName: {
         type: String,
         required: [true, 'Full Name is required.'],
@@ -69,6 +69,6 @@ const EmployeeSchema = new Schema({
     },
 });
 
-const Employee = models.Employee || model('Employee', EmployeeSchema);
+const Employee = mongoose.model('Employee', EmployeeSchema);
 
 export default Employee;
