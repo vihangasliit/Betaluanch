@@ -133,7 +133,9 @@ const AddForm = () => {
 
   return (
     <>
-      <button onClick={() => setShowModal(true)}>show Modal</button>
+      <Button sx={{ display: "flex", justifyContent: "flex-end" }} variant="contained" color="success" onClick={() => setShowModal(true)}>
+        Add People
+      </Button>
       {showModal && (
         <ModelBackground onClick={() => setShowModal(false)}>
           <ModalBody onClick={(e) => e.stopPropagation()}>

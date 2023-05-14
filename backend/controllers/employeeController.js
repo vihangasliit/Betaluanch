@@ -7,15 +7,10 @@ const router = express.Router();
 export const getEmployees = async (req, res) => {
 
     try {
-        const page = req.query.page || 1;
-        const limit = 5;
-        const skip = (page - 1) * limit;
-
         const employees = await EmployeeModel.find()
-            .select('displayName designation employeeType experience')
+            .select('_id employeeId displayName designation employeeType experience')
             .sort({ displayName: 1 })
-            .skip(skip)
-            .limit(limit);
+
 
         res.json(employees);
     } catch (err) {
@@ -29,7 +24,7 @@ export const getEmployeesByFilter = async (req, res) => {
     const employeeTypes = req.query.employeeType;
 
     const employees = await EmployeeModel.find({ employeeType: { $in: employeeTypes } })
-        .select('displayName designation employeeType experience');
+        .select('_id employeeId displayName designation employeeType experience');
 
 }
 

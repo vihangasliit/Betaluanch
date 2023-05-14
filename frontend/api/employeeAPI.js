@@ -12,5 +12,16 @@ const createEmployee = async (employeeData) => {
   }
 }
 
-export { createEmployee };
+const getEmployees = async (page) => {
+  console.log(page);
+  try {
+    const response = await axios.get(`${API_URL}employees?page=${page}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to fetch employees');
+  }
+}
+
+export { createEmployee, getEmployees };
 
