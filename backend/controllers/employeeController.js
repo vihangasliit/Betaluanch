@@ -36,11 +36,14 @@ export const getEmployeesByFilter = async (req, res) => {
 export const createEmployee = async (req, res) => {
 
     const employee = req.body;
-    const newEmployeeModel = new EmployeeModel(employee)
-
     try {
-        await newEmployeeModel.save();
-        res.status(201).json(newEmployeeModel);
+        const lastEmployee = await EmployeeModel.findOne().sort({ employeeId: -1 });
+        const lastEmployeeId = lastEmployee ? lastEmployee.employeeId : 0;
+        const newEmployeeId = `${parseInt(lastEmployeeId) + 1}`.padStart(4, '0');
+        employee.employeeId = newEmployeeId;
+        const newEmployee = new EmployeeModel(employee);
+        await newEmployee.save();
+        res.status(201).json(newEmployee);
     } catch (error) {
         res.status(409).json({ message: error.message });
     }

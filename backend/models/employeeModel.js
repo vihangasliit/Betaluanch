@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import Joi from "joi"
+
 
 const EmployeeSchema = mongoose.Schema({
     fullName: {
@@ -6,9 +8,8 @@ const EmployeeSchema = mongoose.Schema({
         required: [true, 'Full Name is required.'],
     },
     employeeId: {
-        type: Number,
-        required: [true, 'Employee ID is required.'],
-        match: [/^[0-9]{4}$/, 'Please enter a valid Employee ID.'],
+        type: String,
+        default: "0000"
     },
     nameWithInitials: {
         type: String,
@@ -21,10 +22,7 @@ const EmployeeSchema = mongoose.Schema({
     gender: {
         type: String,
         required: [true, 'Gender is required.'],
-        emu: { 
-            // enum validator for gender values
-            values: ["Male", "Female"]
-        }
+        emu: Joi.string().valid('Male', 'Female')
     },
     DOB: {
         type: Date,
@@ -47,10 +45,7 @@ const EmployeeSchema = mongoose.Schema({
     employeeType: {
         type: String,
         required: [true, 'Employee Type is required.'],
-        emu: { 
-            // enum validator 
-            values: ['Full Time', 'Part Time', 'Contract', 'Other'],
-        }
+        emu: Joi.string().valid('Full Time', 'Part Time', 'Contract', 'Other')
     },
     joinDate: {
         type: Date,

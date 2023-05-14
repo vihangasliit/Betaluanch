@@ -5,7 +5,7 @@ import { createEmployee, deleteEmployee, getEmployees, getEmployeesByFilter, upd
 const router = express.Router();
 
 router.get('/filter', getEmployeesByFilter);
-router.get('/', getEmployees);
+router.get('/employees', getEmployees);
 router.post('/',  createEmployee);
 router.patch('/:id', updateEmployee);
 router.delete('/:id', deleteEmployee);
