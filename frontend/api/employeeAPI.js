@@ -12,10 +12,19 @@ const createEmployee = async (employeeData) => {
   }
 }
 
-const getEmployees = async (page) => {
-  console.log(page);
+const updateEmployee = async (id, employeeData) => {
   try {
-    const response = await axios.get(`${API_URL}employees?page=${page}`);
+    const response = await axios.patch(`${API_URL}${id}`, employeeData);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+const getEmployees = async () => {
+  try {
+    const response = await axios.get(`${API_URL}employees`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -23,5 +32,33 @@ const getEmployees = async (page) => {
   }
 }
 
-export { createEmployee, getEmployees };
+const getEmployeeById = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to fetch employees');
+  }
+}
+
+const getEmployeesByFilter = async (employeeType) => {
+  try {
+    const response = await axios.get(`${API_URL}filter?employeeType=${employeeType}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const deleteEmployees = async (id) => {
+  try {
+    const response = await axios.delete(`${API_URL}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export { createEmployee,updateEmployee, getEmployeeById ,getEmployees, getEmployeesByFilter, deleteEmployees };
 

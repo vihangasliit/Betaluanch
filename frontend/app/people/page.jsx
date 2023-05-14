@@ -1,9 +1,18 @@
 "use client";
 
-import AddForm from "@/components/AddForm";
 import React, { useEffect, useState } from "react";
-import { getEmployees } from "../../api/employeeAPI";
+import {
+  getEmployees,
+  getEmployeesByFilter,
+  deleteEmployees,
+} from "../../api/employeeAPI";
 import { DataGrid } from "@mui/x-data-grid";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import { Button, FormControl, Stack } from "@mui/material";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const columns = [
   { field: "displayName", headerName: "Display Name", flex: 1 },
@@ -23,46 +32,129 @@ const columns = [
   {
     field: "experience",
     headerName: "Experience",
-    flex: 1
+    flex: 1,
   },
 ];
 
 const people = () => {
-  const [page, setPage] = useState(1);
   const [employees, setEmployees] = useState([]);
-
+  const [category, setCategory] = useState("");
+  const [selectemployees, setSelectEmployees] = useState({});
+  const router = useRouter();
   useEffect(() => {
-    getEmployees(page)
+    getEmployees()
       .then((employees) => {
         setEmployees(employees);
       })
       .catch((error) => {
         console.error(error);
       });
-  }, []);
+  }, [employees]);
 
-  const rows = employees.map(({ _id, ...rest}) => rest);
+  const handleChange = async (event) => {
+    const employeeType = event.target.value;
+    setCategory(employeeType);
+    await getEmployeesByFilter(employeeType)
+      .then((employees) => {
+        setEmployees(employees);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
-  console.log(rows);
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    const employeeId = selectemployees.row._id;
+    await deleteEmployees(employeeId)
+      .then((employees) => {})
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  function isObjectNotEmpty(obj) {
+    return Object.keys(obj).length !== 0;
+  }
+
+  const rows = employees;
 
   return (
     <div>
-      <AddForm />
-      <div style={{ height: 400, width: '100%' }}>
-      <DataGrid
-        sx={{margin: 10}}
-        rows={rows}
-        columns={columns}
-        getRowId={(row) => row.employeeId}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 1, pageSize: 5 },
-          },
-        }}
-        pageSizeOptions={[5]}
-        checkboxSelection
-      />
-    </div>
+      <Link href="http://localhost:3000/addPeople">
+        <Button
+          sx={{ display: "flex", justifyContent: "flex-start" }}
+          variant="contained"
+          color="success"
+        >
+          Add People
+        </Button>
+      </Link>
+      <FormControl style={{ minWidth: 200, marginTop: 20 }}>
+        <InputLabel id="demo-simple-select-label">Employee Types</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={category}
+          label="Employee Types"
+          onChange={handleChange}
+        >
+          <MenuItem value="Full Time">Full Time</MenuItem>
+          <MenuItem value="Part Time">Part Time</MenuItem>
+          <MenuItem value="Contract">Contract</MenuItem>
+          <MenuItem value="Other">Other</MenuItem>
+        </Select>
+      </FormControl>
+      <div style={{ height: 400, width: "100%" }}>
+        <DataGrid
+          sx={{ margin: 10 }}
+          rows={rows}
+          columns={columns}
+          getRowId={(row) => row.employeeId}
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 5 },
+            },
+          }}
+          pageSizeOptions={[5]}
+          disableMultipleRowSelection={true}
+          onRowClick={(row) => {
+            setSelectEmployees(row);
+          }}
+        />
+        <Stack
+          direction="row-reverse"
+          justifyContent="right"
+          paddingRight={2}
+          spacing={2}
+        >
+          <Link
+            href={{
+              pathname: "http://localhost:3000/editPeople",
+              query: {
+                data: selectemployees?.row?._id
+              }
+            }}
+          >
+            <Button
+              variant="contained"
+              color="success"
+              disabled={!isObjectNotEmpty(selectemployees)}
+            >
+              Edit
+            </Button>
+          </Link>
+
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={(e) => handleDelete(e)}
+            disabled={!isObjectNotEmpty(selectemployees)}
+          >
+            Delete
+          </Button>
+        </Stack>
+      </div>
     </div>
   );
 };

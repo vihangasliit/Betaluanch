@@ -7,10 +7,12 @@ const router = express.Router();
 export const getEmployees = async (req, res) => {
 
     try {
-        const employees = await EmployeeModel.find()
-            .select('_id employeeId displayName designation employeeType experience')
-            .sort({ displayName: 1 })
+        // const page = req.query.page || 1;
+        // const limit = 6;
+        // const skip = (page - 1) * limit;
 
+        const employees = await EmployeeModel.find()
+            .select('_id employeeId displayName designation employeeType experience');
 
         res.json(employees);
     } catch (err) {
@@ -19,13 +21,36 @@ export const getEmployees = async (req, res) => {
     }
 }
 
+export const getEmployeeById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const employee = await EmployeeModel.findById(id)
+
+        if (!employee) {
+            return res.status(404).json({ msg: 'Employee not found' });
+        }
+
+        res.json(employee);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+};
+
 export const getEmployeesByFilter = async (req, res) => {
 
     const employeeTypes = req.query.employeeType;
+    console.log('employeeTypes:', employeeTypes); // Log employeeTypes to console
+    try {
+        const employees = await EmployeeModel.find({ employeeType: { $in: employeeTypes } })
+            .select('_id employeeId displayName designation employeeType experience');
 
-    const employees = await EmployeeModel.find({ employeeType: { $in: employeeTypes } })
-        .select('_id employeeId displayName designation employeeType experience');
-
+        return res.status(200).json(employees);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
 }
 
 export const createEmployee = async (req, res) => {
@@ -46,7 +71,8 @@ export const createEmployee = async (req, res) => {
 
 export const updateEmployee = async (req, res) => {
 
-    updatedFields = req.body;
+    const updatedFields = req.body;
+
 
     try {
         let employee = await EmployeeModel.findById(req.params.id);

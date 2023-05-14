@@ -1,18 +1,19 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import styled from "styled-components";
 import Grid from "@mui/material/Grid";
-import { createEmployee } from "../api/employeeAPI";
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import Link from "next/link";
+import FormLabel from "@mui/material/FormLabel";
+
 
 import "react-datepicker/dist/react-datepicker.css";
+import { getEmployeeById, updateEmployee } from "@/api/employeeAPI";
 
 const ModelBackground = styled.div`
   position: fixed;
@@ -85,51 +86,30 @@ const experience = [
     label: "5 Year",
   },
 ];
+import { useRouter } from "next/navigation";
 
-const AddForm = () => {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    employeeId: "",
-    nameWithInitials: "",
-    displayName: "",
-    gender: "None",
-    DOB: new Date(),
-    email: "",
-    mobileNumber: "",
-    designation: "",
-    employeeType: "None",
-    joinDate: "",
-    experience: "None",
-    salary: "",
-    note: "",
-  });
+
+const editPeople = (data) => {
+
+  const [employee, setEmployee] = useState({});
+
+  useEffect(() => {
+    getEmployeeById(data.searchParams.data)
+      .then((res) => {
+        setEmployee(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   const [startDate, setStartDate] = useState(new Date());
+  const router = useRouter();
 
   const onSubmit = async (e) => {
     e.preventDefault();
-
-    console.log(formData);
-    try {
-      await createEmployee(formData);
-      setFormData({
-        fullName: "",
-        employeeId: "",
-        nameWithInitials: "",
-        displayName: "",
-        gender: "None",
-        DOB: new Date(),
-        email: "",
-        mobileNumber: "",
-        designation: "",
-        employeeType: "None",
-        joinDate: "",
-        experience: "None",
-        salary: "",
-        note: "",
-      });
-    } catch (error) {
-      console.error(error);
-    }
+    await updateEmployee(data.searchParams.data, employee);
+    router.push('http://localhost:3000/people')
   };
 
   return (
@@ -144,54 +124,54 @@ const AddForm = () => {
             columnSpacing={{ xs: 1, sm: 1, md: 1 }}
           >
             <Grid item xs={6} md={6}>
+              <FormLabel component="legend">Full Name</FormLabel>
               <TextField
                 id="filled-basic"
-                label="Full Name"
                 variant="filled"
-                value={formData.fullName}
+                value={employee.fullName}
                 onChange={(e) =>
-                  setFormData({ ...formData, fullName: e.target.value })
+                  setEmployee({ ...employee, fullName: e.target.value })
                 }
               />
             </Grid>
             <Grid item xs={6}>
+              <FormLabel component="legend">Name With Initials</FormLabel>
               <TextField
                 id="filled-basic"
-                label="Name with initials*"
                 variant="filled"
-                value={formData.nameWithInitials}
+                value={employee.nameWithInitials}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
+                  setEmployee({
+                    ...employee,
                     nameWithInitials: e.target.value,
                   })
                 }
               />
             </Grid>
             <Grid item xs={6}>
+              <FormLabel component="legend">Display Name</FormLabel>
               <TextField
                 id="filled-basic"
-                label="Preferred/Display Name"
                 variant="filled"
-                value={formData.displayName}
+                value={employee.displayName}
                 onChange={(e) =>
-                  setFormData({ ...formData, displayName: e.target.value })
+                  setEmployee({ ...employee, displayName: e.target.value })
                 }
               />
             </Grid>
             <Grid item xs={6}>
+              <FormLabel component="legend">Gender</FormLabel>
               <TextField
                 id="outlined-select-currency"
                 select
-                label="Gender"
                 defaultValue="None"
-                value={formData.gender}
+                value={employee.gender}
                 onChange={(e) =>
-                  setFormData({ ...formData, gender: e.target.value })
+                  setEmployee({ ...employee, gender: e.target.value })
                 }
               >
                 <MenuItem selected disabled value="None">
-                  <em>None</em>
+                  <em>{employee.gender}</em>
                 </MenuItem>
                 {gender.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -205,61 +185,61 @@ const AddForm = () => {
               <DatePicker
                 selected={startDate}
                 onChange={(date) =>
-                  setFormData({ ...formData, DOB: date.toISOString() })
+                  setEmployee({ ...employee, DOB: date.toISOString() })
                 }
                 maxDate={moment().toDate()}
               />
             </Grid>
             <Grid item xs={6}>
+              <FormLabel component="legend">Email</FormLabel>
               <TextField
                 id="filled-basic"
-                label="Email"
                 variant="filled"
-                value={formData.email}
+                value={employee.email}
                 onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
+                  setEmployee({ ...employee, email: e.target.value })
                 }
               />
             </Grid>
             <Grid item xs={6}>
+              <FormLabel component="legend">Mobile Number</FormLabel>
               <TextField
                 id="filled-basic"
                 type="number"
-                label="Mobile Number"
                 variant="filled"
-                value={formData.mobileNumber}
+                value={employee.mobileNumber}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
+                  setEmployee({
+                    ...employee,
                     mobileNumber: Number(e.target.value),
                   })
                 }
               />
             </Grid>
             <Grid item xs={6}>
+              <FormLabel component="legend">Designation</FormLabel>
               <TextField
                 id="filled-basic"
-                label="Designation"
                 variant="filled"
-                value={formData.designation}
+                value={employee.designation}
                 onChange={(e) =>
-                  setFormData({ ...formData, designation: e.target.value })
+                  setEmployee({ ...employee, designation: e.target.value })
                 }
               />
             </Grid>
             <Grid item xs={6}>
+              <FormLabel component="legend">Employee Type</FormLabel>
               <TextField
                 id="outlined-select-currency"
                 select
-                label="Employee Type"
                 defaultValue="None"
-                value={formData.employeeType}
+                value={employee.employeeType}
                 onChange={(e) =>
-                  setFormData({ ...formData, employeeType: e.target.value })
+                  setEmployee({ ...employee, employeeType: e.target.value })
                 }
               >
                 <MenuItem selected disabled value="None">
-                  <em>None</em>
+                  <em>{employee.employeeType}</em>
                 </MenuItem>
                 {employeeType.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -273,24 +253,24 @@ const AddForm = () => {
               <DatePicker
                 selected={startDate}
                 onChange={(date) =>
-                  setFormData({ ...formData, joinDate: date.toISOString() })
+                  setEmployee({ ...employee, joinDate: date.toISOString() })
                 }
                 maxDate={moment().toDate()}
               />
             </Grid>
             <Grid item xs={6}>
+              <FormLabel component="legend">Experience</FormLabel>
               <TextField
                 id="outlined-select-currency"
                 select
-                label="Experience"
                 defaultValue="None"
-                value={formData.experience}
+                value={employee.experience}
                 onChange={(e) =>
-                  setFormData({ ...formData, experience: e.target.value })
+                  setEmployee({ ...employee, experience: e.target.value })
                 }
               >
                 <MenuItem selected disabled value="None">
-                  <em>None</em>
+                  <em>{employee.experience}</em>
                 </MenuItem>
                 {experience.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -300,27 +280,27 @@ const AddForm = () => {
               </TextField>
             </Grid>
             <Grid item xs={6}>
+              <FormLabel component="legend">Salary</FormLabel>
               <TextField
                 id="filled-basic"
                 type="number"
-                label="Salary"
                 variant="filled"
-                value={formData.salary}
+                value={employee.salary}
                 onChange={(e) =>
-                  setFormData({ ...formData, salary: Number(e.target.value) })
+                  setEmployee({ ...employee, salary: Number(e.target.value) })
                 }
               />
             </Grid>
             <Grid item xs={6}>
+              <FormLabel component="legend">Note</FormLabel>
               <TextField
                 id="standard-multiline-static"
-                label="Personal Notes"
-                value={formData.note}
+                value={employee.note}
                 multiline
                 rows={4}
                 variant="standard"
                 onChange={(e) =>
-                  setFormData({ ...formData, note: e.target.value })
+                  setEmployee({ ...employee, note: e.target.value })
                 }
               />
             </Grid>
@@ -332,7 +312,7 @@ const AddForm = () => {
             spacing={2}
           >
             <Button variant="contained" color="success" onClick={onSubmit}>
-              Add People
+              Update People
             </Button>
             <Link href="http://localhost:3000/people">
               <Button variant="outlined" color="error">
@@ -346,4 +326,4 @@ const AddForm = () => {
   );
 };
 
-export default AddForm;
+export default editPeople;
