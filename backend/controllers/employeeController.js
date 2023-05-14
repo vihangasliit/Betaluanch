@@ -41,7 +41,6 @@ export const getEmployeeById = async (req, res) => {
 export const getEmployeesByFilter = async (req, res) => {
 
     const employeeTypes = req.query.employeeType;
-    console.log('employeeTypes:', employeeTypes); // Log employeeTypes to console
     try {
         const employees = await EmployeeModel.find({ employeeType: { $in: employeeTypes } })
             .select('_id employeeId displayName designation employeeType experience');
